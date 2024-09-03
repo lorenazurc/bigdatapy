@@ -1,0 +1,44 @@
+import pandas as pd
+import random
+import string
+from datetime import datetime, timedelta
+
+def gerar_nome_aleatorio(tamanho=7):
+    return ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=tamanho))
+
+def gerar_data_aleatoria(inicio, fim):
+    return inicio + timedelta(days=random.randint(0, (fim - inicio).days))
+
+num_linhas = 700
+data_inicio = datetime(2023, 1, 1)
+data_fim = datetime(2024, 1, 1) 
+
+nomes = []
+datas_entrada = []
+datas_saida = []
+medias_tempo_permanencia = []
+
+# Gerar dados
+for _ in range(num_linhas):
+    nome = gerar_nome_aleatorio()
+    data_entrada = gerar_data_aleatoria(data_inicio, data_fim)
+    data_saida = gerar_data_aleatoria(data_entrada, data_fim)
+    media_tempo_permanencia = (data_saida - data_entrada).total_seconds() / 60  # Cálculo da média em minutos
+
+    nomes.append(nome)
+    datas_entrada.append(data_entrada)
+    datas_saida.append(data_saida)
+    medias_tempo_permanencia.append(media_tempo_permanencia)
+
+# Criar DataFrame
+df = pd.DataFrame({
+    'Nome': nomes,
+    'Data de Entrada': datas_entrada,
+    'Data de Saída': datas_saida,
+    'Média de Tempo de Permanência (minutos)': medias_tempo_permanencia
+})
+
+# Adicionar cabeçalho e salvar em um arquivo CSV
+df.to_csv('dados_aleatorios.csv', index=False)
+
+print("Arquivo 'dados_aleatorios.csv' criado com sucesso!")
