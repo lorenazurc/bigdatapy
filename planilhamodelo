@@ -2,6 +2,7 @@ import pandas as pd
 import random
 import string
 from datetime import datetime, timedelta
+import os
 
 def gerar_nome_aleatorio(tamanho=7):
     return ''.join(random.choices(string.ascii_uppercase + string.ascii_lowercase, k=tamanho))
@@ -9,14 +10,26 @@ def gerar_nome_aleatorio(tamanho=7):
 def gerar_data_aleatoria(inicio, fim):
     return inicio + timedelta(days=random.randint(0, (fim - inicio).days))
 
+def importar_nomes(pasta):
+    nomes = []
+    for arquivo in os.listdir(pasta):
+        if arquivo.endswith(".txt"):
+            with open(os.path.join(pasta, arquivo), 'r') as f:
+                nomes.extend(f.read().splitlines())
+    return nomes
+
 num_linhas = 700
 data_inicio = datetime(2023, 1, 1)
 data_fim = datetime(2024, 1, 1) 
 
-nomes = []
+# Importar nomes de uma pasta específica
+pasta_nomes = 'caminho/para/sua/pasta'
+nomes_importados = importar_nomes(pasta_nomes)
+
 datas_entrada = []
 datas_saida = []
 medias_tempo_permanencia = []
+blocos = ['A', 'B', 'C', 'D']
 
 # Gerar dados
 for _ in range(num_linhas):
@@ -25,17 +38,17 @@ for _ in range(num_linhas):
     data_saida = gerar_data_aleatoria(data_entrada, data_fim)
     media_tempo_permanencia = (data_saida - data_entrada).total_seconds() / 60  # Cálculo da média em minutos
 
-    nomes.append(nome)
     datas_entrada.append(data_entrada)
     datas_saida.append(data_saida)
     medias_tempo_permanencia.append(media_tempo_permanencia)
 
 # Criar DataFrame
 df = pd.DataFrame({
-    'Nome': nomes,
+    'Nome': nomes_importados[:num_linhas],  # Usar nomes importados
     'Data de Entrada': datas_entrada,
     'Data de Saída': datas_saida,
-    'Média de Tempo de Permanência (minutos)': medias_tempo_permanencia
+    'Média de Tempo de Permanência (minutos)': medias_tempo_permanencia,
+    'Bloco': [random.choice(blocos) for _ in range(num_linhas)]  # Adicionar coluna de blocos
 })
 
 # Adicionar cabeçalho e salvar em um arquivo CSV
